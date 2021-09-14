@@ -1,0 +1,6 @@
+Waypoint[] wpoints
+float64 v_max
+float64 a_max
+---
+Waypoint[] wpoints
+float64[] times 

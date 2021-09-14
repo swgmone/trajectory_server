@@ -1,0 +1,20 @@
+<launch>
+	<node pkg="trajectory_server_v2" type="trajectory_server_node" name="trajectory_server_v2" output="screen">
+		<param name="poly/order" 						value="5"/>
+		<param name="poly/max_velocity" 				value="0.6"/>
+		<param name="poly/max_acceleration" 			value="0.8"/>
+		<param name="poly/derivate_to_optimize" 		value="2"/>
+
+		<param name="poly/relative_step_size" 			value="0.1"/>
+		<param name="poly/max_iterations" 				value="1000"/>
+		<param name="poly/obj_rel_value" 				value="0.05"/>
+		<param name="poly/obj_abs_value" 				value="-1.0"/>
+		<param name="poly/state_rel_value" 				value="-1.0"/>
+		<param name="poly/state_abs_value" 				value="-1.0"/>
+		<param name="poly/random_seed" 					value="0.0"/>
+		
+		<param name="poly/time_gain" 					value="0.00001"/>
+		<param name="poly/soft_constraints_gain" 		value="0.1"/>
+		<param name="poly/soft_constraints_epsilon" 	value="1"/>
+	</node>
+</launch>
