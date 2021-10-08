@@ -4,7 +4,7 @@
 /* Date: August 2020                           */
 /* File: trajectory_server_node.cpp            */
 
-#include <trajectory_server_v2/trajectory_server.hpp>
+#include <trajectory_server/trajectory_server.hpp>
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "trajectory_server_node");

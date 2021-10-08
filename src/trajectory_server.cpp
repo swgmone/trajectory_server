@@ -4,7 +4,7 @@
 /* Date: August 2020                           */
 /* File: trajectory_server.cpp                 */
 
-#include <trajectory_server_v2/trajectory_server.hpp>
+#include <trajectory_server/trajectory_server.hpp>
 
 TrajectoryServer::TrajectoryServer(ros::NodeHandle& nh):
     planPolyTrajectory(nh.advertiseService("/plan_poly_trajectory", &TrajectoryServer::planPoly, this)){
@@ -407,8 +407,8 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
 }
 
 // Services
-bool TrajectoryServer::planPoly(trajectory_server_v2::PlanPolyTraj::Request& request,
-                                trajectory_server_v2::PlanPolyTraj::Response& response){
+bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& request,
+                                trajectory_server::PlanPolyTraj::Response& response){
     ros::Time startTime = ros::Time::now();
     if(request.v_max > 0.0){
         velMax = request.v_max;
@@ -503,13 +503,13 @@ bool TrajectoryServer::planPoly(trajectory_server_v2::PlanPolyTraj::Request& req
         response.times.push_back(times[i]);
 
     for(uint i = 0; i < wayPoints->allConstraints.size(); i += (polyOrder+1)/2){
-        trajectory_server_v2::Waypoint msg;
+        trajectory_server::Waypoint msg;
         msg.x = wayPoints->allConstraints[i].value(0);
         msg.y = wayPoints->allConstraints[i].value(1);
         msg.z = wayPoints->allConstraints[i].value(2);
 
         for(uint j = 1; j < (polyOrder+1)/2; j++){
-            trajectory_server_v2::Constraint msg_c;
+            trajectory_server::Constraint msg_c;
             msg_c.x = wayPoints->allConstraints[i + j].value(0);
             msg_c.y = wayPoints->allConstraints[i + j].value(1);
             msg_c.z = wayPoints->allConstraints[i + j].value(2);

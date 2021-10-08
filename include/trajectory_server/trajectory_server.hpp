@@ -11,10 +11,10 @@
 #include <Eigen/Sparse>
 #include <nlopt.hpp>
 
-#include <poly_lib/poly_lib.hpp>
-#include <trajectory_server_v2/PlanPolyTraj.h>
-#include <trajectory_server_v2/Waypoint.h>
-#include <trajectory_server_v2/Constraint.h>
+#include <trajectory_server/poly_lib.hpp>
+#include <trajectory_server/PlanPolyTraj.h>
+#include <trajectory_server/Waypoint.h>
+#include <trajectory_server/Constraint.h>
 
 class Constraint{
     #define CONSTR_NULL std::numeric_limits<double>::max()
@@ -104,8 +104,8 @@ class TrajectoryServer{
     void computeCost(const std::vector<double>& x, std::vector<double>& grad, double& cost);
 
     // Services Functions
-    bool planPoly(trajectory_server_v2::PlanPolyTraj::Request& request,
-                  trajectory_server_v2::PlanPolyTraj::Response& response);
+    bool planPoly(trajectory_server::PlanPolyTraj::Request& request,
+                  trajectory_server::PlanPolyTraj::Response& response);
 
     public:
     // Constructor

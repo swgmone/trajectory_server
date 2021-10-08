@@ -1,5 +1,5 @@
 <launch>
-	<node pkg="trajectory_server_v2" type="trajectory_server_node" name="trajectory_server_v2" output="screen">
+	<node pkg="trajectory_server" type="trajectory_server_node" name="trajectory_server" output="screen">
 		<param name="poly/order" 						value="5"/>
 		<param name="poly/max_velocity" 				value="0.6"/>
 		<param name="poly/max_acceleration" 			value="0.8"/>
