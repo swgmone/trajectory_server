@@ -24,7 +24,7 @@ class Constraint{
     uint derivID = -1;
     uint occurID = -1;
 
-    Eigen::Matrix<double, 3, 1> value;
+    Eigen::Matrix<double, 2, 1> value;
 
     // Helper Functions
     inline bool operator==(const Constraint& rhs) const{
@@ -40,7 +40,7 @@ class Constraint{
 
 class WayPoint{ 
     public:
-    std::vector<Eigen::Matrix<double, 3, 1>> pose;
+    std::vector<Eigen::Matrix<double, 2, 1>> pose;
 
     std::vector<Constraint> allConstraints,
                             fixedConstraints,

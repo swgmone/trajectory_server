@@ -132,7 +132,7 @@ void TrajectoryServer::computeReorderingMatrixAndConstraints(Eigen::SparseMatrix
 
     C.resize(wayPoints->allConstraints.size(), wayPoints->allConstraints.size());
     tripleList.reserve(wayPoints->allConstraints.size());
-    df.resize(wayPoints->fixedConstraints.size(), 3);
+    df.resize(wayPoints->fixedConstraints.size(), 2);
 
     for(uint i = 0; i < wayPoints->allConstraints.size(); i++){
         for(uint j = 0; j < wayPoints->fixedConstraints.size(); j++)
@@ -150,7 +150,7 @@ void TrajectoryServer::computeReorderingMatrixAndConstraints(Eigen::SparseMatrix
 }
 
 void TrajectoryServer::nonLinearOptimize(std::vector<double>& times){
-    uint varNumber = (wayPoints->freeConstraints.size()*3) + times.size();
+    uint varNumber = (wayPoints->freeConstraints.size()*2) + times.size();
 
     // Set Up Initial Solution and Bounds
     std::vector<double> initialSolution, initialStepSize,
@@ -174,7 +174,7 @@ void TrajectoryServer::nonLinearOptimize(std::vector<double>& times){
     }
 
     for(uint i = 0; i < wayPoints->freeConstraints.size(); i++){
-        for(uint j = 0; j < 3; j++){
+        for(uint j = 0; j < 2; j++){
             initialSolution.push_back(wayPoints->freeConstraints[i].value(j));
 
             if(wayPoints->freeConstraints[i].derivID == 1){
@@ -204,7 +204,7 @@ void TrajectoryServer::nonLinearOptimize(std::vector<double>& times){
     std::cout << "ACC: " << accMax << std::endl;
     
     // Define Optimization Object From NLopt Library
-    nlopt::opt opt(/*nlopt::LN_COBYLA*/ /*LN_BOBYQA*/ nlopt::LN_SBPLX, varNumber);
+    nlopt::opt opt(nlopt::LN_COBYLA, varNumber);
     opt.set_min_objective(TrajectoryServer::J, this);
     opt.set_initial_step(initialStepSize);
     opt.set_maxeval(maxIterations);
@@ -234,11 +234,11 @@ void TrajectoryServer::nonLinearOptimize(std::vector<double>& times){
         for(uint i = 0; i < wayPoints->allConstraints.size(); i++){
             for(uint j = 0; j < wayPoints->freeConstraints.size(); j++){
                 if(wayPoints->allConstraints[i] == wayPoints->freeConstraints[j]){
-                    for(uint k = 0; k < 3; k++){
+                    for(uint k = 0; k < 2; k++){
                         wayPoints->allConstraints[i].value(k) = initialSolution[times.size() + index + k];
                     }
 
-                    index += 3;
+                    index += 2;
                     break;
                 }
             }
@@ -268,11 +268,11 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
     Eigen::MatrixXd derivates;
     std::vector<double> times;
 
-    double timeSize = x.size() - wayPoints->freeConstraints.size()*3;
+    double timeSize = x.size() - wayPoints->freeConstraints.size()*2;
     double derivatesSize = wayPoints->allConstraints.size();
 
     times.reserve(timeSize);
-    derivates.resize(derivatesSize, 3);
+    derivates.resize(derivatesSize, 2);
     derivates.setZero();
 
     uint index = 0;
@@ -292,9 +292,9 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
         bool found = false;
         for(uint j = 0; j < wayPoints->freeConstraints.size(); j++){
             if(wayPoints->allConstraints[i] == wayPoints->freeConstraints[j]){
-                derivates.row(row) = Eigen::Matrix<double, 3, 1>(x[index], x[index+1], x[index+2]);
+                derivates.row(row) = Eigen::Matrix<double, 2, 1>(x[index], x[index+1]);
                 
-                index += 3;
+                index += 2;
                 found = true;
 
                 break;
@@ -310,27 +310,22 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
 
     // Define Polynomials
     std::vector<Polynomial*> polys_x(wayPoints->pose.size() - 1),
-                             polys_y(wayPoints->pose.size() - 1),
-                             polys_z(wayPoints->pose.size() - 1);
+                             polys_y(wayPoints->pose.size() - 1);
 
     for(uint i = 0; i < polys_x.size(); i++){
         std::vector<double> startDerivates_x((polyOrder + 1)/2), endDerivates_x((polyOrder + 1)/2),
-                            startDerivates_y((polyOrder + 1)/2), endDerivates_y((polyOrder + 1)/2),
-                            startDerivates_z((polyOrder + 1)/2), endDerivates_z((polyOrder + 1)/2);
+                            startDerivates_y((polyOrder + 1)/2), endDerivates_y((polyOrder + 1)/2);
 
         for(uint j = 0; j < (polyOrder + 1)/2; j++){
             startDerivates_x[j] = derivates(i*(polyOrder + 1) + j, 0);
             startDerivates_y[j] = derivates(i*(polyOrder + 1) + j, 1);
-            startDerivates_z[j] = derivates(i*(polyOrder + 1) + j, 2);
 
             endDerivates_x[j] = derivates(i*(polyOrder + 1) + (polyOrder + 1)/2 + j, 0);
             endDerivates_y[j] = derivates(i*(polyOrder + 1) + (polyOrder + 1)/2 + j, 1);
-            endDerivates_z[j] = derivates(i*(polyOrder + 1) + (polyOrder + 1)/2 + j, 2);
         }
         
         polys_x[i] = new Polynomial(polyOrder, 0, times[i], startDerivates_x, endDerivates_x);
         polys_y[i] = new Polynomial(polyOrder, 0, times[i], startDerivates_y, endDerivates_y);
-        polys_z[i] = new Polynomial(polyOrder, 0, times[i], startDerivates_z, endDerivates_z);
     }
 
     // Compute Cost Function
@@ -370,13 +365,13 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
     for(uint i = 0; i < times.size(); i++)
         totalTime += times[i];
 
-    costTime = timeGain*pow(totalTime, 2);
+    costTime = timeGain*totalTime;
 
     // Compute Maximum Velocity and Acceleration
     std::vector<double> vel, acc;
     for(uint i = 0; i < polys_x.size(); i++){
-       Eigen::MatrixXd velCoeffs = polys_x[i]->convolve(1, 2) + polys_y[i]->convolve(1, 2) + polys_z[i]->convolve(1, 2);
-       Eigen::MatrixXd accCoeffs = polys_x[i]->convolve(2, 3) + polys_y[i]->convolve(2, 3) + polys_z[i]->convolve(2, 3);
+       Eigen::MatrixXd velCoeffs = polys_x[i]->convolve(1, 2) + polys_y[i]->convolve(1, 2);
+       Eigen::MatrixXd accCoeffs = polys_x[i]->convolve(2, 3) + polys_y[i]->convolve(2, 3);
 
         Polynomial velocity(velCoeffs), acceleration(accCoeffs);
         std::pair<double, double> minimum_v, minimum_a, maximum_v, maximum_a;
@@ -402,7 +397,6 @@ void TrajectoryServer::computeCost(const std::vector<double>& x, std::vector<dou
     for(uint i = 0; i < polys_x.size(); i++){
         delete polys_x[i];
         delete polys_y[i];
-        delete polys_z[i];
     }
 }
 
@@ -425,7 +419,7 @@ bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& reques
 
     // Set Up wayPoints
     for(uint i = 0; i < request.wpoints.size(); i++){
-        Eigen::Matrix<double, 3, 1> p(request.wpoints[i].x, request.wpoints[i].y, request.wpoints[i].z);
+        Eigen::Matrix<double, 2, 1> p(request.wpoints[i].x, request.wpoints[i].y);
         wayPoints->pose.push_back(p);
 
         uint constraintOccurence = 2;
@@ -440,7 +434,7 @@ bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& reques
             constraint.value = p;
 
             if(c == 1){
-                constraint.value = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
+                constraint.value = Eigen::Matrix<double, 2, 1>(0.0, 0.0);
             }
 
             wayPoints->allConstraints.push_back(constraint);
@@ -448,9 +442,8 @@ bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& reques
 
             uint k = 1;
             for(uint j = 0; j < request.wpoints[i].constraints.size(); j++){
-                Eigen::Matrix<double, 3, 1> derConstraint(request.wpoints[i].constraints[j].x,
-                                                          request.wpoints[i].constraints[j].y,
-                                                          request.wpoints[i].constraints[j].z);
+                Eigen::Matrix<double, 2, 1> derConstraint(request.wpoints[i].constraints[j].x,
+                                                          request.wpoints[i].constraints[j].y);
                 constraint.pointID = i;
                 constraint.derivID = j+1;
                 constraint.occurID = c;
@@ -467,10 +460,10 @@ bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& reques
                     constraint.pointID = i;
                     constraint.derivID = index;
                     constraint.occurID = c;
-                    constraint.value = Eigen::Matrix<double, 3, 1>(CONSTR_NULL, CONSTR_NULL, CONSTR_NULL);
+                    constraint.value = Eigen::Matrix<double, 2, 1>(CONSTR_NULL, CONSTR_NULL);
         
                     if(c == 1){
-                        constraint.value = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
+                        constraint.value = Eigen::Matrix<double, 2, 1>(0.0, 0.0);
                         wayPoints->fixedConstraints.push_back(constraint);
                     }else{
                         wayPoints->freeConstraints.push_back(constraint);
@@ -506,13 +499,11 @@ bool TrajectoryServer::planPoly(trajectory_server::PlanPolyTraj::Request& reques
         trajectory_server::Waypoint msg;
         msg.x = wayPoints->allConstraints[i].value(0);
         msg.y = wayPoints->allConstraints[i].value(1);
-        msg.z = wayPoints->allConstraints[i].value(2);
 
         for(uint j = 1; j < (polyOrder+1)/2; j++){
             trajectory_server::Constraint msg_c;
             msg_c.x = wayPoints->allConstraints[i + j].value(0);
             msg_c.y = wayPoints->allConstraints[i + j].value(1);
-            msg_c.z = wayPoints->allConstraints[i + j].value(2);
 
             msg.constraints.push_back(msg_c);
         }
