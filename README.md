@@ -1,6 +1,6 @@
 # Trajectory Server
 ## An optimization-based trajectory planner
-<img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj.jpg" width = 46% height = 30%/> <img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj_field.svg" width = 46% height = 25%/>
+<img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj.jpg" width = 46% height = 30%/> <img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj_field.svg" width = 46% height = 15%/>
 
 ## Authors
   * Lorenzo Gentilini - PhD Student
