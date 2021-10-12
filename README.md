@@ -25,7 +25,6 @@ The flexibility of our implementation allows to specify a variable number of der
 ## Reference
 If you make use of this code, please cite:
 * L. Gentilini, S. Rossi, D. Mengoli, A. Eusebi, L. Marconi. **Trajectory Planning ROS Service for an Autonomous Agricultural Robot**. IEEE MetroAgriFor 2021. 
-
 <!-- ([Paper](--), [BibTex](--)) -->
 
 ## Trajectory Generation Example
