@@ -1,10 +1,13 @@
 # Trajectory Server
-## An optimization-based trajectory planner
+## An Optimization-based Trajectory Planner
 <img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj.jpg" width = 47% height = 30%/><img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj_field.svg" width = 43.8% height = 30%/>
 
 The trajectory_server module is an optimization-based trajectory planner able to process an unlimited number of waypoints, each of which specified as:
 1) *w<sub>i</sub>* the plane position of the waypoint,
 2) *C<sub>i</sub>*  a vector of constraints.
+
+The implemented optimization procedure allows to generate optimal polynomial trajectories by weighting the overall travel time and the trajectory smoothness.
+The flexibility of our implementation allows to specify a variable number of derivative constraints for each waypoints letting the remaining quantities, needed to completely define the polynomial curve, to be free. These degrees of freedom are used by the trajectory optimization procedure to minimize a fixed trajectory cost.
 
 ## Authors
   * Lorenzo Gentilini - PhD Student
@@ -44,4 +47,8 @@ roslaunch trajectory_server trajectory_server_node
 4) Run the client
 ```
 rosrun trajectory_server trajectory_test_node
+```
+The provided example generate an optimal polynomial trajectory passing through nine waypoints:
+```
+x<sub>1</sub> = -11.0, y<sub>1</sub> = 10.0, 
 ```
