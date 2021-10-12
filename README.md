@@ -50,13 +50,27 @@ rosrun trajectory_server trajectory_test_node
 ```
 The provided example generate an optimal polynomial trajectory passing through nine waypoints:
 ```
-x1 = -11.0, y1 = 10.0
-x2 = -4.0,  y2 = 10.0
-x3 = -4.0,  y3 = -10.0
-x4 = 3.0,   y4 = -10.0
-x5 = 3.0,   y5 = 10.0
-x6 = 10.0,  y6 = 10.0
-x7 = 10.0,  y7 = -10.0
-x8 = 17.0,  y8 = -10.0
-x9 = 17.0,  y9 = 10.0
+x1 = -11.0,  y1 =  10.0
+x2 = -4.0,   y2 =  10.0
+x3 = -4.0,   y3 = -10.0
+x4 =  3.0,   y4 = -10.0
+x5 =  3.0,   y5 =  10.0
+x6 =  10.0,  y6 =  10.0
+x7 =  10.0,  y7 = -10.0
+x8 =  17.0,  y8 = -10.0
+x9 =  17.0,  y9 =  10.0
 ```
+The *trajectory_test_node.cpp* file provides an example of the full interface to our planner.
+If you would like to change these waypoints, please check the *trajectory_test_node.cpp* file.
+
+The provided example generate an optimal polynomial trajectory on the basis of the following parameters:
+1) *Polynomial order* = 7,
+2) *Derivative to optimize* = 3,
+3) *Maximum velocity* = 0.6,
+4) *Maximum acceleration* = 0.8,
+5) *Time cost gain* = 0.01,
+6) *Effort cost gain* = 1.0,
+7) *Soft Constraint Gain* = 0.1,
+8) *Soft Constraint Epsilon* = 1.0.
+
+If you would like to test the trajectory optimization procedure with different parameters please check the *trajectory_server.launch* file.
