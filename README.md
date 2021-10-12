@@ -1,6 +1,9 @@
 # Trajectory Server
 ## An optimization-based trajectory planner
-<img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj.jpg" width = 47% height = 30% border="10"/><img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj_field.svg" width = 43.8% height = 30% border="10"/>
+<img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj.jpg" width = 47% height = 30%/><img src="https://github.com/swgmone/trajectory_server/blob/main/images/traj_field.svg" width = 43.8% height = 30%/>
+The trajectory_server module is an optimization-based trajectory planner able to process an unlimited number of waypoints, each of which specified as:
+1) w_i the plane position of the waypoint,
+2) C_i a vector of constraints.
 
 ## Authors
   * Lorenzo Gentilini - PhD Student
