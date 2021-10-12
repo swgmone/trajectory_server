@@ -50,5 +50,13 @@ rosrun trajectory_server trajectory_test_node
 ```
 The provided example generate an optimal polynomial trajectory passing through nine waypoints:
 ```
-x_1= -11.0, y<sub>1</sub> = 10.0, 
+x1 = -11.0, y1 = 10.0
+x2 = -4.0,  y2 = 10.0
+x3 = -4.0,  y3 = -10.0
+x4 = 3.0,   y4 = -10.0
+x5 = 3.0,   y5 = 10.0
+x6 = 10.0,  y6 = 10.0
+x7 = 10.0,  y7 = -10.0
+x8 = 17.0,  y8 = -10.0
+x9 = 17.0,  y9 = 10.0
 ```
